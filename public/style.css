@@ -1,58 +1,68 @@
+/* General body */
 body {
-  background: #0a0a0a;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
 }
 
-.container {
-  width: 90%;
-  max-width: 900px;
-  margin: 20px auto;
+/* Headings */
+h1, h2 {
+    color: #58a6ff;
 }
 
-h1 {
-  text-align: center;
-  color: #00bfff;
-}
-
+/* Sections */
 section {
-  margin: 20px 0;
-  padding: 15px;
-  background: #111;
-  border-radius: 8px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    padding: 15px;
+    margin: 15px;
+    border-radius: 10px;
 }
 
-input, button {
-  padding: 8px;
-  margin: 5px;
+/* Input fields */
+input[type="text"], input[type="file"] {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    color: #c9d1d9;
+    width: 70%;
+    margin-right: 10px;
 }
 
+/* Buttons */
 button {
-  background: #00bfff;
-  border: none;
-  cursor: pointer;
-  color: #000;
-  font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    background: #238636;
+    color: #ffffff;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
 }
 
-ul {
-  list-style: none;
-  padding: 0;
+button:hover {
+    background: #2ea043;
 }
 
-li {
-  margin: 10px 0;
-  background: #222;
-  padding: 10px;
-  border-radius: 5px;
+/* Bot list */
+ul#botList {
+    list-style: none;
+    padding: 0;
 }
 
-pre {
-  background: #000;
-  padding: 10px;
-  height: 200px;
-  overflow-y: scroll;
-  border-radius: 5px;
+ul#botList li {
+    padding: 8px;
+    border-bottom: 1px solid #30363d;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Start button inside list */
+ul#botList li button {
+    padding: 4px 8px;
+    font-size: 0.9em;
 }
