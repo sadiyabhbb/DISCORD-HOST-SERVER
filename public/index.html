@@ -2,33 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Bot Hosting Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
+<title>Bot Hosting</title>
 </head>
 <body>
-<div class="container">
-  <h1>Bot Hosting Dashboard</h1>
+<h1>Bot Hosting Console</h1>
 
-  <section class="upload">
-    <h2>Upload Bot</h2>
-    <form id="uploadForm">
-      <input type="text" placeholder="Bot Name" id="botName" required>
-      <input type="file" id="botFile" required>
-      <button type="submit">Upload</button>
-    </form>
-  </section>
+<section id="upload-section">
+  <h2>Upload Bot</h2>
+  <input type="text" id="botName" placeholder="Bot Name (optional)">
+  <input type="file" id="botFiles" multiple>
+  <button onclick="uploadBot()">Upload</button>
+</section>
 
-  <section class="bots">
-    <h2>Running Bots</h2>
-    <ul id="botList"></ul>
-  </section>
+<section id="bots-section">
+  <h2>All Bots</h2>
+  <ul id="botList"></ul>
+</section>
 
-  <section class="console">
-    <h2>Console Logs</h2>
-    <pre id="consoleOutput"></pre>
-  </section>
-</div>
-
-<script src="scripts.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
