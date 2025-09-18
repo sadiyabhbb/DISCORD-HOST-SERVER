@@ -1,47 +1,6 @@
-body {
-  font-family: Arial, sans-serif;
-  background: #0d1117;
-  color: #c9d1d9;
-  margin: 0;
-  padding: 0;
-}
-.container {
-  max-width: 800px;
-  margin: 50px auto;
-  padding: 20px;
-  background: #161b22;
-  border-radius: 8px;
-  box-shadow: 0 0 10px #000;
-}
-h1, h2 {
-  color: #58a6ff;
-}
-form input, form button {
-  padding: 10px;
-  margin: 5px;
-  border-radius: 4px;
-  border: none;
-}
-form button {
-  background: #238636;
-  color: white;
-  cursor: pointer;
-}
-#botsList {
-  margin-top: 20px;
-}
-.botCard {
-  background: #21262d;
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 5px;
-}
-.botCard button {
-  margin-right: 5px;
-  padding: 5px 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-.startBtn { background: #238636; color: white; }
-.stopBtn { background: #da3633; color: white; }
+body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; padding: 20px; }
+h1 { color: #00bfff; }
+input, button { padding: 10px; margin: 5px 0; }
+button { cursor: pointer; background: #00bfff; color: #000; border: none; border-radius: 5px; }
+ul { list-style: none; padding: 0; }
+li { background: #111; margin: 5px 0; padding: 10px; border-radius: 5px; }
