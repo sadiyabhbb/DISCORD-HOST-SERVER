@@ -1,24 +1,17 @@
 const express = require("express");
 const fs = require("fs-extra");
 const path = require("path");
-const cors = require("cors");
-const multer = require("multer");
 const { spawn } = require("child_process");
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 const DATA_FILE = path.join(__dirname, "data/bots.json");
+const BOTS_FOLDER = path.join(__dirname, "bots");
 fs.ensureFileSync(DATA_FILE);
 
-let runningBots = {}; // Track running child processes
-
-// Multer setup for bot file uploads
-const upload = multer({ dest: "bots/" });
-
-// Load & save bot info
+// Load bots.json
 function loadBots() {
   try {
     return fs.readJSONSync(DATA_FILE);
@@ -26,71 +19,65 @@ function loadBots() {
     return [];
   }
 }
+
+// Save bots.json
 function saveBots(bots) {
   fs.writeJSONSync(DATA_FILE, bots, { spaces: 2 });
 }
 
-// Upload bot
-app.post("/upload", upload.single("bot"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
-  const bots = loadBots();
-  bots.push({
-    name: req.body.name || req.file.originalname,
-    file: req.file.filename,
-    status: "Stopped",
-    addedTime: Date.now(),
-    logs: []
-  });
-  saveBots(bots);
-  res.json({ success: true, message: "Bot uploaded", bot: bots[bots.length - 1] });
-});
+// Run all bots
+function runBots() {
+  const botFiles = fs.readdirSync(BOTS_FOLDER).filter(f => f.endsWith(".js"));
 
-// List bots
+  botFiles.forEach(file => {
+    const filePath = path.join(BOTS_FOLDER, file);
+    const botProcess = spawn("node", [filePath]);
+
+    botProcess.stdout.on("data", data => {
+      console.log(`[${file}] stdout: ${data}`);
+      const bots = loadBots();
+      const bot = bots.find(b => b.file === file);
+      if (bot) bot.logs = bot.logs || [];
+      if (bot) bot.logs.push(data.toString());
+      saveBots(bots);
+    });
+
+    botProcess.stderr.on("data", data => {
+      console.error(`[${file}] stderr: ${data}`);
+    });
+
+    botProcess.on("close", code => {
+      console.log(`[${file}] exited with code ${code}`);
+    });
+  });
+}
+
+// API to get bots
 app.get("/bots", (req, res) => {
   const bots = loadBots();
   res.json(bots);
 });
 
-// Start bot
-app.post("/start", (req, res) => {
-  const { filename } = req.body;
+// API to add bot manually
+app.post("/bots/add", (req, res) => {
+  const { name, file } = req.body;
+  if (!name || !file) return res.status(400).json({ error: "name & file required" });
+
   const bots = loadBots();
-  const bot = bots.find(b => b.file === filename);
-  if (!bot) return res.status(404).json({ error: "Bot not found" });
-  if (runningBots[filename]) return res.json({ message: "Bot already running" });
-
-  const child = spawn("node", [`bots/${filename}`], { stdio: ["pipe", "pipe", "pipe"] });
-
-  child.stdout.on("data", data => {
-    bot.logs.push(data.toString());
-    saveBots(bots);
+  bots.push({
+    name,
+    file,
+    status: "Stopped",
+    addedTime: Date.now(),
+    logs: []
   });
-  child.stderr.on("data", data => {
-    bot.logs.push("ERR: " + data.toString());
-    saveBots(bots);
-  });
-  child.on("close", code => {
-    bot.status = "Stopped";
-    saveBots(bots);
-    delete runningBots[filename];
-  });
-
-  bot.status = "Running";
   saveBots(bots);
-  runningBots[filename] = child;
-
-  res.json({ success: true, message: "Bot started" });
+  res.json({ success: true });
 });
 
-// Stop bot
-app.post("/stop", (req, res) => {
-  const { filename } = req.body;
-  const child = runningBots[filename];
-  if (!child) return res.status(404).json({ error: "Bot not running" });
-
-  child.kill();
-  res.json({ success: true, message: "Bot stopped" });
-});
-
+// Start server and run bots
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Bot Hosting Dashboard running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  runBots();  // run all bots on server start
+});
