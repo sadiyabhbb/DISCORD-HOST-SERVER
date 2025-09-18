@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Example Bot",
+    "file": "example-bot.js",
+    "status": "Stopped",
+    "addedTime": 1758208322456,
+    "logs": []
+  },
+  {
+    "name": "Test Bot",
+    "file": "test-bot.js",
+    "status": "Stopped",
+    "addedTime": 1758208423456,
+    "logs": []
+  }
+]
