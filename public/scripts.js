@@ -1,49 +1,42 @@
-const uploadForm = document.getElementById("uploadForm");
-const botList = document.getElementById("botList");
-const consoleOutput = document.getElementById("consoleOutput");
-
 async function fetchBots() {
   const res = await fetch("/bots");
   const bots = await res.json();
-  botList.innerHTML = "";
+  const list = document.getElementById("botList");
+  list.innerHTML = "";
   bots.forEach(bot => {
     const li = document.createElement("li");
-    li.innerHTML = `<strong>${bot.name}</strong> - ${bot.status} 
-      <button onclick="startBot('${bot.id}')">Start</button>
-      <button onclick="stopBot('${bot.id}')">Stop</button>
-      <button onclick="showLogs('${bot.id}')">Logs</button>`;
-    botList.appendChild(li);
+    li.textContent = bot.name;
+    const startBtn = document.createElement("button");
+    startBtn.textContent = "Start";
+    startBtn.onclick = () => startBot(bot.name, "index.js"); // main entry
+    li.appendChild(startBtn);
+    list.appendChild(li);
   });
 }
 
-async function startBot(id) {
-  await fetch(`/bots/start/${id}`, { method: "POST" });
-  fetchBots();
-}
+async function uploadBot() {
+  const name = document.getElementById("botName").value;
+  const files = document.getElementById("botFiles").files;
+  if (!files.length) return alert("Select files first");
 
-async function stopBot(id) {
-  await fetch(`/bots/stop/${id}`, { method: "POST" });
-  fetchBots();
-}
-
-async function showLogs(id) {
-  const res = await fetch(`/bots/logs/${id}`);
-  const logs = await res.json();
-  consoleOutput.textContent = logs.join("\n");
-}
-
-uploadForm.addEventListener("submit", async e => {
-  e.preventDefault();
-  const fileInput = document.getElementById("botFile");
-  const botName = document.getElementById("botName").value;
   const formData = new FormData();
-  formData.append("file", fileInput.files[0]);
-  formData.append("name", botName);
-  await fetch("/bots/add", { method: "POST", body: formData });
-  fileInput.value = "";
-  fetchBots();
-});
+  formData.append("name", name);
+  for (let f of files) formData.append("files", f);
 
-// Initial load
+  const res = await fetch("/upload", { method: "POST", body: formData });
+  const data = await res.json();
+  alert(data.message);
+  fetchBots();
+}
+
+async function startBot(name, entryFile) {
+  const res = await fetch("/start", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, entryFile })
+  });
+  const data = await res.json();
+  alert(data.message);
+}
+
 fetchBots();
-setInterval(fetchBots, 5000);
