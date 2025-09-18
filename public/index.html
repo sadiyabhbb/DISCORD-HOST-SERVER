@@ -1,25 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bot Hosting Dashboard</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bot Hosting Dashboard</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Bot Hosting Dashboard</h1>
+  <h1>Bot Hosting Dashboard</h1>
 
-    <form id="uploadForm">
-      <input type="file" name="bot" required>
-      <input type="text" name="name" placeholder="Bot Name (optional)">
-      <button type="submit">Upload Bot</button>
-    </form>
+  <h2>Upload Bot</h2>
+  <input type="file" id="botFile">
+  <input type="text" id="botName" placeholder="Bot Name">
+  <button onclick="uploadBot()">Upload</button>
 
-    <h2>Uploaded Bots</h2>
-    <div id="botsList"></div>
-  </div>
+  <h2>Running Bots</h2>
+  <ul id="botList"></ul>
 
-  <script src="script.js"></script>
+<script>
+async function fetchBots() {
+  const res = await fetch("/bots");
+  const bots = await res.json();
+  const list = document.getElementById("botList");
+  list.innerHTML = "";
+  bots.forEach((bot, i) => {
+    const li = document.createElement("li");
+    li.textContent = `${i+1}. ${bot.name} (${bot.status})`;
+    list.appendChild(li);
+  });
+}
+
+async function uploadBot() {
+  const fileInput = document.getElementById("botFile");
+  const nameInput = document.getElementById("botName");
+  if (!fileInput.files[0] || !nameInput.value) return alert("Select file & name");
+
+  const file = fileInput.files[0];
+  const name = nameInput.value;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    const res = await fetch("/bots/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, file: file.name })
+    });
+    const data = await res.json();
+    alert("Bot uploaded!");
+    fetchBots();
+  };
+  reader.readAsText(file);
+}
+
+fetchBots();
+</script>
 </body>
-                            </html>
+</html>
